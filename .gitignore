@@ -1,0 +1,21 @@
+# Build output
+*.exe
+*.pdb
+bin/
+obj/
+
+# Local user data (never commit)
+settings.cfg
+earnings.cache
+
+# Editors / OS
+.vs/
+.vscode/
+*.user
+Thumbs.db
+desktop.ini
+
+# Scratch
+*.bak
+*.tmp
+__pycache__/
