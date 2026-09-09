@@ -1,6 +1,8 @@
 # Genera clock.ico (multi-resolución, PNG dentro de ICO) con un reloj estilo BetaClock.
 Add-Type -AssemblyName System.Drawing
-$dir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$dir = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Definition)
+$assets = Join-Path $dir "assets"
+if (-not (Test-Path $assets)) { New-Item -ItemType Directory -Path $assets | Out-Null }
 
 function New-ClockPng([int]$sz) {
     $bmp = New-Object System.Drawing.Bitmap($sz, $sz, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
@@ -98,5 +100,5 @@ foreach ($s in $sizes) {
 }
 foreach ($s in $sizes) { $bw.Write($pngs[$s]) }
 $bw.Flush()
-[System.IO.File]::WriteAllBytes((Join-Path $dir "clock.ico"), $out.ToArray())
-"clock.ico generado ($([math]::Round((Get-Item (Join-Path $dir 'clock.ico')).Length/1KB,1)) KB)"
+[System.IO.File]::WriteAllBytes((Join-Path $assets "clock.ico"), $out.ToArray())
+"clock.ico generado ($([math]::Round((Get-Item (Join-Path $assets 'clock.ico')).Length/1KB,1)) KB)"

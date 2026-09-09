@@ -2,16 +2,20 @@
 # Nothing to install.
 $ErrorActionPreference = 'Stop'
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+
 $csc = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 if (-not (Test-Path $csc)) { $csc = "C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe" }
+if (-not (Test-Path $csc)) { throw "C# compiler not found. Is .NET Framework 4.x installed?" }
 
-# Every .cs in the folder: ClockForm is split across several `partial class` files.
-$sources = Get-ChildItem -Path $dir -Filter *.cs | Sort-Object Name | ForEach-Object { $_.FullName }
-if ($sources.Count -eq 0) { throw "No .cs sources found in $dir" }
+# Every .cs under src\, at any depth: ClockForm is split across several
+# `partial class` files that the compiler merges back into one class.
+$sources = Get-ChildItem -Path (Join-Path $dir 'src') -Filter *.cs -Recurse |
+           Sort-Object FullName | ForEach-Object { $_.FullName }
+if ($sources.Count -eq 0) { throw "No .cs sources found under $dir\src" }
 Write-Host ("Compiling {0} source files..." -f $sources.Count)
 
-$out = Join-Path $dir "BetaClock.exe"
-$icon = Join-Path $dir "clock.ico"
+$out  = Join-Path $dir "BetaClock.exe"
+$icon = Join-Path $dir "assets\clock.ico"
 $iconArg = if (Test-Path $icon) { "/win32icon:$icon" } else { "" }
 
 & $csc /noconfig /nologo /codepage:65001 /target:winexe /optimize+ /out:"$out" $iconArg `

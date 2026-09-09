@@ -2,7 +2,7 @@
 
 **An always-on-top LED desktop clock, built for trading.** Native Windows app (C#/WinForms), a single ~114 KB `.exe` with no dependencies and no installer. Accurate time (NTP), market session, holidays, earnings for your watchlist, alarms, 6 languages and skins — floating over your trading platform without ever stealing its focus.
 
-![BetaClock](screenshot.png)
+![BetaClock](assets/screenshot.png)
 
 ---
 
@@ -64,33 +64,36 @@ anyway**. Two more things worth knowing before you decide to trust it:
 
 ## 📁 Project files
 
-No file goes over 300 lines. `ClockForm` is split across several `partial class`
-files, which the compiler merges back into one class — so each concern lives on
-its own without any indirection at runtime.
+No file goes over 300 lines, and each folder owns one concern. `ClockForm` is
+split across several `partial class` files, which the compiler merges back into a
+single class — so the split costs nothing at runtime.
 
-| File | What it is | Lines |
-|---|---|---|
-| `Program.cs` | Entry point, single instance, DPI awareness | 74 |
-| `ClockForm.cs` | Main window: state, startup, current time | 175 |
-| `ClockForm.Window.cs` | Placement, sizing, mouse and keyboard | 234 |
-| `ClockForm.Drawing.cs` | Painting the clock face and color modes | 191 |
-| `ClockForm.Digits.cs` | Low-level 7-segment and candlestick drawing | 227 |
-| `ClockForm.Market.cs` | Market sessions, NYSE holidays, Forex | 271 |
-| `ClockForm.Earnings.cs` | Earnings fetch, cache and display lines | 246 |
-| `ClockForm.Alarms.cs` | Alarm scheduling, sound and firing | 230 |
-| `ClockForm.Menu.cs` | Context menu (right-click and tray) | 218 |
-| `ClockForm.Ntp.cs` | SNTP time synchronization | 103 |
-| `ClockForm.System.cs` | Start with Windows, tray icon, shutdown | 95 |
-| `Settings.cs` | Persistent settings (`key=value` file) | 157 |
-| `Models.cs` | `Alarm` and `EarningEvent` | 77 |
-| `JsonParser.cs` | Minimal dependency-free JSON parser | 110 |
-| `AlarmManagerForm.cs` | Alarm manager dialog | 204 |
-| `AlarmAlertForm.cs` | Alarm alert popup | 124 |
-| `EarningsForm.cs` | Earnings panel dialog | 145 |
-| `AboutForm.cs` | About dialog | 109 |
-| `BetaClockI18n.cs` | Translation system (`Tr`, 6 languages, English base) | 282 |
-| `build.ps1` | Build script (compiles every `.cs` in the folder) | — |
-| `make_icon.ps1` | Regenerates `clock.ico` | — |
+```
+src/
+  App/         Program.cs                 entry point, single instance, DPI
+               ClockForm.cs               main window: state, startup, current time
+               ClockForm.Window.cs        placement, sizing, mouse and keyboard
+               ClockForm.Menu.cs          context menu (right-click and tray)
+               ClockForm.System.cs        start with Windows, tray icon, shutdown
+               AboutForm.cs               about dialog
+  Rendering/   ClockForm.Drawing.cs       clock face and color modes
+               ClockForm.Digits.cs        7-segment and candlestick drawing
+  Market/      ClockForm.Market.cs        sessions, NYSE holidays, Forex
+               ClockForm.Earnings.cs      earnings fetch, cache and display
+               EarningsForm.cs            earnings panel dialog
+  Alarms/      ClockForm.Alarms.cs        scheduling, sound and firing
+               AlarmManagerForm.cs        alarm manager dialog
+               AlarmAlertForm.cs          alarm alert popup
+  Time/        ClockForm.Ntp.cs           SNTP synchronization
+  Core/        Settings.cs                persistent key=value settings
+               Models.cs                  Alarm and EarningEvent
+               JsonParser.cs              minimal dependency-free JSON parser
+               BetaClockI18n.cs           translations (Tr, 6 languages)
+
+assets/        clock.ico, screenshot.png
+tools/         make_icon.ps1              regenerates the icon
+build.ps1      compiles every .cs under src/
+```
 
 **User settings:** `%APPDATA%\BetaClock\settings.cfg` (plain `key=value` format).
 **Earnings cache:** `%APPDATA%\BetaClock\earnings.cache`.
@@ -110,9 +113,9 @@ Or manually:
 ```powershell
 & "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" `
     /noconfig /nologo /codepage:65001 /target:winexe /optimize+ `
-    /win32icon:clock.ico /out:BetaClock.exe `
+    /win32icon:assets\clock.ico /out:BetaClock.exe `
     /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-    BetaClock.cs BetaClockI18n.cs
+    (Get-ChildItem src -Filter *.cs -Recurse | % FullName)
 ```
 
 > ⚠️ **Close the app before rebuilding** (it locks the `.exe`): `Stop-Process -Name BetaClock`.
@@ -124,8 +127,8 @@ Or manually:
 
 > The **base language of the code is English**: the English literal IS the dictionary key, and Spanish is just another translation.
 
-1. In `BetaClock.cs`, wrap the English literal with `Tr.T("...")`.
-2. In `BetaClockI18n.cs`, inside `EnsureInit()`, add a row:
+1. In any source file, wrap the English literal with `Tr.T("...")`.
+2. In `src/Core/BetaClockI18n.cs`, inside `EnsureInit()`, add a row:
    ```csharp
    A("english", "español", "português", "deutsch", "français", "中文");
    ```
