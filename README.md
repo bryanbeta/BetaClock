@@ -115,17 +115,7 @@ Every bar of the 7-segment digit is drawn as a **candlestick** (body + wicks). G
 
 ---
 
-## 🗺️ Roadmap / ideas
-
-- [ ] Package as **MSIX** and publish to the Microsoft Store.
-- [ ] **Multiple time zones** at once (NY / London / Tokyo / local).
-- [ ] **Candle-close countdown** (1m / 5m / 15m / 1h) for entry timing.
-- [ ] Holidays: NYSE only today; other markets could be added.
-- [ ] (Optional) Native-speaker review of the translations.
-
----
-
-## 🛠️ Technical gotchas already solved (for future work)
+## 🛠️ Technical gotchas already solved (read before patching)
 
 - **C# 5 compiler**: the in-box `csc` supports no `$"…"` interpolation, no `?.`, no `nameof`, no auto-property initializers. `Timer` is ambiguous → use `System.Windows.Forms.Timer`. `NumericUpDown` has no `Wrap`.
 - **Multi-monitor DPI**: use **Per-Monitor-V2** (`SetProcessDpiAwarenessContext(-4)`) + `AutoScaleMode.None`. Dragging uses the **native drag** (`WM_NCLBUTTONDOWN`) so the window does not "fly" off-screen between monitors with different scaling.
