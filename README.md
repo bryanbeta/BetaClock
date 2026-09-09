@@ -1,4 +1,4 @@
-# 🕒 BetaClock
+# 🕒 BetaClock — always-on-top LED trading clock for Windows
 
 **An always-on-top LED desktop clock, built for trading.** Native Windows app (C#/WinForms), a single ~114 KB `.exe` with no dependencies and no installer. Accurate time (NTP), market session, holidays, earnings for your watchlist, alarms, 6 languages and skins — floating over your trading platform without ever stealing its focus.
 
