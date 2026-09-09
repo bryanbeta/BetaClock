@@ -6,6 +6,33 @@
 
 ---
 
+## ⬇️ Download
+
+Grab `BetaClock.exe` from the [latest release](../../releases/latest). There is no
+installer: drop it anywhere and double-click it.
+
+```
+SHA-256  6a9fbd027c0874d7a3c6fdf02c7a95ead0ddaabcca65ac8b326ee254943fccff
+```
+
+**Windows will warn you the first time.** The binary is not code-signed, so
+SmartScreen shows *"Windows protected your PC"*. Click **More info** → **Run
+anyway**. Two more things worth knowing before you decide to trust it:
+
+- **An antivirus may flag it heuristically.** Look at the profile: a small
+  unsigned executable that opens UDP sockets (NTP), makes HTTPS requests
+  (earnings) and — only if you switch on "Start with Windows" — writes one value
+  under `HKCU\...\Run`. To a heuristic that reads like malware, even though every
+  one of those is a documented feature whose source is right here in this repo.
+- **The build is not reproducible.** The in-box C# compiler stamps a fresh
+  identifier and timestamp on every compile, so rebuilding will *not* give you the
+  same hash. The SHA-256 above tells you your download arrived intact — it does
+  not prove the binary came from this source. If you would rather not trust a
+  binary at all, [build it yourself](#-build): it is one command and needs nothing
+  installed.
+
+---
+
 ## ✨ Features
 
 - **7-segment LED clock** HH:MM:SS drawn by hand with GDI+, draggable, always on top, and it never steals focus from your trading platform (`WS_EX_NOACTIVATE` overlay).
@@ -37,14 +64,33 @@
 
 ## 📁 Project files
 
-| File | What it is |
-|---|---|
-| `BetaClock.cs` | Main source (app, drawing, logic) |
-| `BetaClockI18n.cs` | Translation system (`Tr` class, 6-language table, English base) |
-| `build.ps1` | Recompile script |
-| `make_icon.ps1` | Regenerates `clock.ico` (the clock icon) |
-| `clock.ico` | App icon |
-| `README.md` | This file |
+No file goes over 300 lines. `ClockForm` is split across several `partial class`
+files, which the compiler merges back into one class — so each concern lives on
+its own without any indirection at runtime.
+
+| File | What it is | Lines |
+|---|---|---|
+| `Program.cs` | Entry point, single instance, DPI awareness | 74 |
+| `ClockForm.cs` | Main window: state, startup, current time | 175 |
+| `ClockForm.Window.cs` | Placement, sizing, mouse and keyboard | 234 |
+| `ClockForm.Drawing.cs` | Painting the clock face and color modes | 191 |
+| `ClockForm.Digits.cs` | Low-level 7-segment and candlestick drawing | 227 |
+| `ClockForm.Market.cs` | Market sessions, NYSE holidays, Forex | 271 |
+| `ClockForm.Earnings.cs` | Earnings fetch, cache and display lines | 246 |
+| `ClockForm.Alarms.cs` | Alarm scheduling, sound and firing | 230 |
+| `ClockForm.Menu.cs` | Context menu (right-click and tray) | 218 |
+| `ClockForm.Ntp.cs` | SNTP time synchronization | 103 |
+| `ClockForm.System.cs` | Start with Windows, tray icon, shutdown | 95 |
+| `Settings.cs` | Persistent settings (`key=value` file) | 157 |
+| `Models.cs` | `Alarm` and `EarningEvent` | 77 |
+| `JsonParser.cs` | Minimal dependency-free JSON parser | 110 |
+| `AlarmManagerForm.cs` | Alarm manager dialog | 204 |
+| `AlarmAlertForm.cs` | Alarm alert popup | 124 |
+| `EarningsForm.cs` | Earnings panel dialog | 145 |
+| `AboutForm.cs` | About dialog | 109 |
+| `BetaClockI18n.cs` | Translation system (`Tr`, 6 languages, English base) | 282 |
+| `build.ps1` | Build script (compiles every `.cs` in the folder) | — |
+| `make_icon.ps1` | Regenerates `clock.ico` | — |
 
 **User settings:** `%APPDATA%\BetaClock\settings.cfg` (plain `key=value` format).
 **Earnings cache:** `%APPDATA%\BetaClock\earnings.cache`.
